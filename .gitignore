@@ -1,0 +1,31 @@
+# Python bytecode and local environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# IDE and editor state
+.idea/
+.vscode/
+
+# Streamlit local secrets
+.streamlit/secrets.toml
+
+# Downloaded model weights and caches
+checkpoints/
+model_weights/
+.cache/
+hf_cache/
+
+# Generated app outputs and logs
+outputs/
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
