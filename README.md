@@ -31,6 +31,8 @@ Open the local URL printed by Vite (usually http://localhost:5173). The first pr
 - React + Vite single-page interface with a responsive upload flow
 - FastAPI endpoint calling the existing Depth Anything V2 inference helper
 - Original and colorized depth map side by side
+- Adjustable photo/depth overlay with a draggable comparison divider
+- Relative-depth histogram from farther to nearer regions
 - Click-to-inspect relative depth at a selected point
 - Optional captions for near, middle, and far regions, arranged as a short visual narrative
 - Clear warm-near / cool-far legend and model limitation note
