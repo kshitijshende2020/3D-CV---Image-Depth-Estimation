@@ -41,3 +41,13 @@ The returned result contains a predicted depth array and a displayable depth ima
 ## Sample photo
 
 The official demo's built-in street image was used for the remote verification. A reusable local sample still needs to be added to `sample_data/`. A direct download attempt from the COCO image host was rejected because its TLS certificate name did not match; certificate checks were not bypassed. We can use an approved dataset/official repository sample or a user-provided photo for the local run.
+
+## Candidate evaluation metric: pairwise depth-order accuracy
+
+Keep this as a candidate for the project evaluation; it is not finalized yet. For each valid pair of pixels in an RGB-D test image, use the sensor depth to identify which pixel is nearer. Count a pair as correct when the model predicts the same near/far order. Report correct pairs divided by all evaluated pairs, as a percentage. Skip pixels without valid sensor depth. This suits the selected model's relative-depth output better than comparing its raw values directly with distances in meters.
+
+Related reference: [Analyzing Results of Depth Estimation Models With Monocular Criteria (CVPR Workshop 2023)](https://openaccess.thecvf.com/content/CVPR2023W/XAI4CV/html/Theiner_Analyzing_Results_of_Monocular_Depth_Estimation_With_Monocular_Criteria_CVPRW_2023_paper.html).
+
+## Point-cloud visualization approach
+
+The React branch includes an RGB point-cloud view derived from the image and the predicted relative-depth map. It samples up to roughly 8,000 pixels, keeps each pixel's RGB color, and projects it using a pinhole-camera formula with an assumed 60-degree horizontal field of view. Relative depth is mapped to arbitrary z values from 1 (near) to 4 (far). These coordinates are for visualization only; they are not calibrated distances or a complete reconstruction. The browser viewer allows rotation and zoom, and can export an ASCII PLY point cloud.

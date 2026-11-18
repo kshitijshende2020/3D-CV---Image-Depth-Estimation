@@ -14,6 +14,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 from code.depth_estimator import colorize_depth, normalize_depth
 from code.depth_estimator import estimate_depth as run_estimator
+from code.pointcloud import make_point_cloud
 
 app = FastAPI(title="Seeing Depth API")
 app.add_middleware(
@@ -98,6 +99,7 @@ async def estimate(file: UploadFile = File(...)):
     normalized = normalize_depth(depth)
     grayscale = Image.fromarray((normalized * 255).round().astype(np.uint8), mode="L")
     color = colorize_depth(normalized)
+    point_cloud = make_point_cloud(image, depth)
     return {
         "depth": png_data(grayscale),
         "color": png_data(color),
@@ -105,6 +107,8 @@ async def estimate(file: UploadFile = File(...)):
         "height": image.height,
         "inferenceMs": elapsed_ms,
         "model": "Depth Anything V2 Small",
+        "pointCloud": point_cloud,
+        "pointCloudNote": "Approximate relative-depth geometry with an assumed 60-degree horizontal field of view and arbitrary units.",
     }
 
 
