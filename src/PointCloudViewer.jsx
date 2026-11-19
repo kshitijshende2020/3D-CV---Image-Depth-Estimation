@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Download, RotateCcw } from 'lucide-react'
 
 function PointCloudViewer({ points }) {
   const canvasRef = useRef(null)
@@ -29,7 +30,7 @@ function PointCloudViewer({ points }) {
       canvas.width = Math.round(bounds.width * ratio)
       canvas.height = Math.round(bounds.height * ratio)
       context.setTransform(ratio, 0, 0, ratio, 0, 0)
-      context.fillStyle = '#101712'
+      context.fillStyle = '#06090a'
       context.fillRect(0, 0, bounds.width, bounds.height)
 
       const cosX = Math.cos(rotation.x)
@@ -133,12 +134,16 @@ function PointCloudViewer({ points }) {
         aria-label="Rotatable, approximate colored 3D point cloud"
       />
       <div className="point-cloud-hint">DRAG TO ORBIT <i /> SCROLL TO ZOOM</div>
-      <button className="point-cloud-reset" onClick={() => { setRotation({ x: -0.15, y: 0.32 }); setZoom(1) }}>RESET VIEW</button>
+      <button className="point-cloud-reset" onClick={() => { setRotation({ x: -0.15, y: 0.32 }); setZoom(1) }}>
+        <RotateCcw size={12} style={{ display: 'inline', verticalAlign: '-1px', marginRight: '6px' }} />RESET VIEW
+      </button>
     </div>
     <div className="point-cloud-meta">
       <div><strong>{points.length.toLocaleString()}</strong><span>colored points</span></div>
       <p>Approximate shape · assumed 60° camera field of view · arbitrary depth scale</p>
-      <button className="story-button" onClick={downloadPly}>Download .PLY point cloud</button>
+      <button className="story-button" onClick={downloadPly}>
+        <Download size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }} />Download .PLY point cloud
+      </button>
     </div>
   </div>
 }
