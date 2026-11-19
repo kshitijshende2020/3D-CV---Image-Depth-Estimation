@@ -1,5 +1,6 @@
 # Python bytecode and local environments
 __pycache__/
+node_modules/
 *.py[cod]
 *$py.class
 .venv/
@@ -12,6 +13,8 @@ env/
 # IDE and editor state
 .idea/
 .vscode/
+dist/
+.vite/
 
 # Streamlit local secrets
 .streamlit/secrets.toml
@@ -25,6 +28,9 @@ hf_cache/
 # Generated app outputs and logs
 outputs/
 *.log
+
+# Local evaluation datasets (keep large RGB-D data out of Git)
+evaluation_data/
 
 # OS metadata
 .DS_Store
