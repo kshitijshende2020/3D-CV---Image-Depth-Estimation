@@ -1,73 +1,136 @@
-# Seeing Depth
+# Seeing Depth: Monocular Relative Depth Estimation & Multimodal 3D Vision Studio
 
-**A visual studio for exploring relative depth in an ordinary photograph.** Upload one image, run Depth Anything V2 Small, compare the original with its warm-near / cool-far depth map, and click any point to inspect its relative reading.
+## 1. Project Description
 
-Use **Tell the depth story** to caption three depth bands and read them from foreground to background. This optional feature uses the BLIP image-captioning model on each region. Its first use downloads about 990 MB of additional model weights; normal depth estimation does not require that download. The captions are AI-generated and can misidentify objects, especially when a depth band contains several overlapping regions.
+**Seeing Depth** is an exploratory computer vision studio that infers continuous relative 3D depth from an ordinary 2D photograph using the **Depth Anything V2 Small** foundation model. It transforms a single monocular image into an interactive spatial environment, allowing users to inspect ordinal depth values, manipulate virtual optical depth-of-field, isolate spatial depth slices, and explore 2.5D geometric point clouds.
 
-Depth is normalized independently for each photo. It is an estimate of which regions appear nearer or farther, not a physical distance in meters. Reflective surfaces, thin details, and low-texture areas can be difficult for the model.
 
-## Run locally
 
-Requirements: Python 3.10+, Node.js 18+, and internet access the first time the model weights are needed.
+## 2. Project Team & Contributions
 
+| S.No | Member Name      | Roll Number | Major Responsibilities & Contributions |
+| :---: |:-----------------|:------------| :--- |
+| **1** | *Bongu Ashish*   | *23bds014*  | *[e.g., Model integration, FastAPI backend, NYU Depth V2 benchmark evaluation]* |
+| **2** | *Abhinav A*      | *23bec002*  | *[e.g., Frontend React architecture, Box Focus & Depth Isolator tools]* |
+| **3** | *Kshitij Shende* | *23bcs075*  | *[e.g., 3D Point Cloud projection, Colormaps, UI styling & documentation]* |
+
+---
+
+## 3. Installation & How to Run on a Different Device
+
+### Prerequisites
+Ensure the target device has the following installed:
+* **Python 3.10+** (with `pip`)
+* **Node.js 18+** (with `npm`)
+* **Git**
+* Internet access during the first launch to download model weights from Hugging Face (~99 MB for Depth Anything V2 Small; ~990 MB if the optional BLIP depth-story feature is used).
+
+---
+
+### Step 1: Clone or Copy the Repository
 ```powershell
+git clone <repository-url>
+cd project-single-image-depth-estimation-build
+```
+
+---
+
+### Step 2: Set Up & Run the Python Backend
+
+Open a terminal in the project root directory:
+
+**Windows (PowerShell):**
+```powershell
+# 1. Create a Python virtual environment
 python -m venv .venv
+
+# 2. Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
+
+# 3. Upgrade pip and install backend dependencies
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+
+# 4. Start the FastAPI server on port 8000
 python -m uvicorn api:app --reload
 ```
 
-In another terminal:
+**macOS / Linux:**
+```bash
+# 1. Create a Python virtual environment
+python3 -m venv .venv
+
+# 2. Activate the virtual environment
+source .venv/bin/activate
+
+# 3. Upgrade pip and install backend dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4. Start the FastAPI server on port 8000
+python3 -m uvicorn api:app --reload
+```
+
+*(Leave this terminal running. The API will be active at `http://127.0.0.1:8000`)*.
+
+---
+
+### Step 3: Set Up & Run the React Frontend
+
+Open a **second terminal** in the project root directory:
 
 ```powershell
+# 1. Install frontend packages
 npm install
+
+# 2. Start the Vite development server
 npm run dev
 ```
 
-Open the local URL printed by Vite (usually http://localhost:5173). The first prediction downloads the pretrained checkpoint from Hugging Face (about 99 MB). CPU inference is supported; a compatible GPU can make it faster.
+*(If PowerShell blocks npm execution on Windows, run `cmd.exe /c npm run dev` instead)*.
 
-## Evaluate relative depth ordering
+---
 
-The repository does not include the NYU Depth V2 dataset. Download or use the locally extracted dataset, then check that the following folders exist:
-
+### Step 4: Open the Application
+Open your web browser and navigate to:
 ```text
-evaluation_data/nyu-depth-png/
-├── images/val/
-└── depth/val/
+http://localhost:5173
 ```
+* Upload any photograph (JPG, PNG, or WebP) or click any of the **5 sample cards** in the gallery to test depth estimation, 3D point cloud viewing, box focus, and depth slicing.
 
-The `val` folder is the 654-image Eigen test split in this dataset package. The evaluation script defaults to a reproducible 100-image subset so a first run is manageable on CPU. Run it from the project root in the same Python environment used for the API:
+---
+
+### Optional: Reproducing the NYU Depth V2 Benchmark
+To run the automated relative depth evaluation against the ground-truth NYU Depth V2 validation dataset:
 
 ```powershell
-python -m code.evaluate_depth
+# Ensure .venv is activated, then run:
+python -m code.evaluate_depth --limit 100
 ```
+* Use `--limit 0` to score all 654 images in the Eigen validation split.
+* Evaluation results and comparison panels are saved under `outputs/evaluation/`.
 
-For the complete test split, use `python -m code.evaluate_depth --limit 0`. Results are saved under `outputs/evaluation/`: `summary.json`, per-image scores in `per_image_results.csv`, and RGB / sensor / prediction comparison images. These files are generated locally and are not included in Git.
+---
 
-The primary score is **pairwise depth-order accuracy**. It samples valid pixel pairs whose sensor depths differ by at least 10 cm, then measures how often the model puts the nearer pixel in front of the farther one. The script also reports a simple baseline that assumes lower image rows are nearer. This is a relative-order evaluation; it does not claim the selected model predicts accurate distances in meters. Sensor depth is stored in millimeters and converted to meters when read. The downloaded dataset stays in the ignored `evaluation_data/` folder.
+## 4. References & Acknowledgments
 
-## What it includes
+1. **Depth Anything V2:**
+   * Yang, L., Kang, B., Huang, Z., Xu, X., Feng, J., & Zhao, H. (2024). *Depth Anything V2: A Foundation Model for Monocular Depth Estimation*. [arXiv:2406.09414](https://arxiv.org/abs/2406.09414).
+   * Checkpoint: [Hugging Face `depth-anything/Depth-Anything-V2-Small-hf`](https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf) (Apache-2.0 License).
 
-- React + Vite single-page interface with a responsive upload flow
-- FastAPI endpoint calling the existing Depth Anything V2 inference helper
-- Original and colorized depth map side by side
-- Adjustable photo/depth overlay with a draggable comparison divider
-- Rotatable, colored pseudo-3D point cloud with a downloadable PLY file
-- Relative-depth histogram from farther to nearer regions
-- Click-to-inspect relative depth at a selected point
-- Optional captions for near, middle, and far regions, arranged as a short visual narrative
-- Reproducible NYU Depth V2 evaluation with a vertical-position baseline and visual comparisons
-- Clear warm-near / cool-far legend and model limitation note
+2. **Salesforce BLIP (Bootstrapping Language-Image Pre-training):**
+   * Li, J., Li, D., Xiong, C., & Hoi, S. (2022). *BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation*. [arXiv:2201.12086](https://arxiv.org/abs/2201.12086).
+   * Checkpoint: [Hugging Face `Salesforce/blip-image-captioning-base`](https://huggingface.co/Salesforce/blip-image-captioning-base) (BSD-3-Clause License).
 
-## Model
+3. **NYU Depth Dataset V2:**
+   * Silberman, N., Hoiem, D., Kohli, P., & Fergus, R. (2012). *Indoor Segmentation and Support Inference from RGBD Images*. European Conference on Computer Vision (ECCV).
 
-Depth Anything V2 Small, relative-depth checkpoint through Hugging Face Transformers. The Small checkpoint is Apache-2.0 licensed.
+4. **Depth-Aware Computational Photography & Inpainting:**
+   * Shih, M. L., Su, S. Y., Kopf, J., & Huang, J. B. (2020). *3D Photography using Context-aware Layered Depth Inpainting*. IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR).
 
-- [Hugging Face model card](https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf)
-- [Depth Anything V2 paper](https://arxiv.org/abs/2406.09414)
-- [BLIP image-captioning model card](https://huggingface.co/Salesforce/blip-image-captioning-base) (BSD-3-Clause)
-- [`code/depth_estimator.py`](code/depth_estimator.py): model loading, inference, normalization, and color mapping
-- [`api.py`](api.py): HTTP interface
-- [`src/App.jsx`](src/App.jsx): React interface
-- [`src/PointCloudViewer.jsx`](src/PointCloudViewer.jsx): browser-based point-cloud viewer and PLY export
-- [`code/pointcloud.py`](code/pointcloud.py): pixel-to-3D projection using estimated relative depth
+5. **Core Open-Source Libraries:**
+   * [PyTorch](https://pytorch.org/) & [Hugging Face Transformers](https://huggingface.co/docs/transformers) (Deep learning inference)
+   * [FastAPI](https://fastapi.tiangolo.com/) & [Uvicorn](https://www.uvicorn.org/) (Asynchronous HTTP API)
+   * [React](https://react.dev/) & [Vite](https://vitejs.dev/) (Modern frontend framework & bundler)
+   * [Lucide React](https://lucide.dev/) (UI iconography)
+   * [NumPy](https://numpy.org/) & [Pillow](https://python-pillow.org/) (Array processing and image manipulation)
